@@ -317,7 +317,126 @@ module CodeWriter
 
     return assembly_builder
   end
-  
+
+  def writeCall(function_name, num_args)
+    assembly_builder = []
+    assembly_builder.push(
+      
+    )
+
+    return assembly_builder
+
+    # push return-address
+    # push LCL
+    # push ARG
+    # push THIS
+    # push THAT
+    # ARG = SP-n-5
+    # LCL = SP
+    # got f
+    # (return address)
+  end
+
+  def writeFunction(function_name, num_locals)
+    assembly_builder = []
+    assembly_builder.push(
+      "(#{function_name})", # Declare a label for the function entry
+    )
+
+    num_locals.to_i.times do |i|
+      puts i
+      assembly_builder.concat writePushPop('C_PUSH', 'argument', i)
+    end
+
+    # function f k
+    # (f)
+    # repeat k times
+    # push 0
+    return assembly_builder
+  end
+
+  def writeReturn
+    assembly_builder = []
+
+    # Exp
+    # M[300] = 258
+
+    # FRAME = LCL
+    assembly_builder.push(
+      '@LCL',          # A = 1
+      'A=M',           # A = 300 
+      'D=M',           # D = M[300]
+      '@6',            # A = 6
+      'M=D'            # M[6] = 258
+    )
+
+    # RET = *(FRAME - 5)
+    assembly_builder.push(
+      '@6',            # A = 1
+      'D=M-1',         # D = M[300] - 5
+      'D=D-1',         # D = M[300] - 5
+      'D=D-1',         # D = M[300] - 5
+      'D=D-1',         # D = M[300] - 5
+      'D=D-1',         # D = M[300] - 5
+      '@7',             # A = 7
+      'M=D'            # M[7] = 253
+    )
+
+    # *ARG = pop()
+    assembly_builder.concat(
+      writePushPop('C_POP', 'argument', 0)
+    )
+
+    # SP = ARG + 1
+    assembly_builder.push(
+      '@ARG',    # A=ARG,
+      'D=M+1',  # D=M[ARG] + 1
+      '@SP',    # A=0
+      'M=D'     # M[0]=D 
+    )
+
+    # THAT = *(FRAME-1)
+    assembly_builder.push(
+      '@6',      # A=6,
+      'D=M-1',  # D=M[6] - 1
+      '@THAT',  # A=0
+      'M=D'     # M[0]=D 
+    )
+    # THIS = *(FRAME - 2)
+    assembly_builder.push(
+      '@THAT',     # A=THAT,
+      'D=M-1',    # D=M[THAT] - 1
+      '@THIS',    # A=THIS
+      'M=D'       # M[THIS]=D 
+    )
+
+    # ARG = *(FRAME - 3)
+    assembly_builder.push(
+      '@THIS',     # A=THIS,
+      'D=M-1',    # D=M[THIS] - 1
+      '@ARG',     # A=ARG
+      'M=D'       # M[ARG]=D 
+    )
+
+    # LCL = *(FRAME - 4)
+    assembly_builder.push(
+      '@ARG',     # A=ARG,
+      'D=M-1',    # D=M[ARG] - 1
+      '@LCL',    # A=LCL
+      'M=D'       # M[LCL]=D 
+    )
+    
+    # goto RET
+    assembly_builder.push(
+      '@LCL',
+      'D=M-1',
+      'A=D',
+      '0;JMP'
+    )
+
+    return assembly_builder
+  end
+
   # Closes the output file
   # PARAMETER void
   # RETURN void

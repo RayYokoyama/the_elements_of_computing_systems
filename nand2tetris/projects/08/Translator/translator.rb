@@ -45,6 +45,12 @@ class Translator
           elsif %w[C_PUSH C_POP].include?(p.command_type)
             w.write writePushPop(p.command_type, p.arg1, p.arg2).join("\n")
             w.write "\n"
+          elsif p.command_type == 'C_FUNCTION'
+            w.write writeFunction(p.arg1, p.arg2).join("\n")
+            w.write "\n"
+          elsif p.command_type == 'C_RETURN'
+            w.write writeReturn().join("\n")
+            w.write "\n"
           end
         end
       end

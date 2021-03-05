@@ -14,16 +14,16 @@ class Translator
   def execute
     File.open(@file_path, 'r') do |f|
       File.open("#{@file_name_without_ext}.asm", 'w') do |w|
-        w.write set_sp.join("\n")
-        w.write "\n"
-        w.write set_local.join("\n")
-        w.write "\n"
-        w.write set_arg.join("\n")
-        w.write "\n"
-        w.write set_this.join("\n")
-        w.write "\n"
-        w.write set_that.join("\n")
-        w.write "\n"
+        # w.write set_sp.join("\n")
+        # w.write "\n"
+        # w.write set_local.join("\n")
+        # w.write "\n"
+        # w.write set_arg.join("\n")
+        # w.write "\n"
+        # w.write set_this.join("\n")
+        # w.write "\n"
+        # w.write set_that.join("\n")
+        # w.write "\n"
         f.each_line do |line|
           formated_line = delete_comment_out(line) ## //**** を消す
           next if formated_line.empty?

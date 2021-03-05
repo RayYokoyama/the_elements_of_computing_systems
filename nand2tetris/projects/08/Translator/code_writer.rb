@@ -364,7 +364,7 @@ module CodeWriter
     # FRAME = LCL
     assembly_builder.push(
       '@LCL',          # A = 1
-      'A=M',           # A = 300 
+      'A=M',           # A = M[1] = 300
       'D=M',           # D = M[300]
       '@6',            # A = 6
       'M=D'            # M[6] = 258
@@ -372,8 +372,8 @@ module CodeWriter
 
     # RET = *(FRAME - 5)
     assembly_builder.push(
-      '@6',            # A = 1
-      'D=M-1',         # D = M[300] - 5
+      '@6',            # A = 6
+      'D=M-1',         # D = M[6] - 5 = 0 - 5
       'D=D-1',         # D = M[300] - 5
       'D=D-1',         # D = M[300] - 5
       'D=D-1',         # D = M[300] - 5
@@ -389,7 +389,7 @@ module CodeWriter
 
     # SP = ARG + 1
     assembly_builder.push(
-      '@ARG',    # A=ARG,
+      '@ARG',   # A=ARG,
       'D=M+1',  # D=M[ARG] + 1
       '@SP',    # A=0
       'M=D'     # M[0]=D 
@@ -397,22 +397,22 @@ module CodeWriter
 
     # THAT = *(FRAME-1)
     assembly_builder.push(
-      '@6',      # A=6,
-      'D=M-1',  # D=M[6] - 1
+      '@6',     # A=6,
+      'D=M-1',  # D=M[6] - 1 = 1234 - 1
       '@THAT',  # A=0
       'M=D'     # M[0]=D 
     )
     # THIS = *(FRAME - 2)
     assembly_builder.push(
-      '@THAT',     # A=THAT,
-      'D=M-1',    # D=M[THAT] - 1
+      '@THAT',    # A=4,
+      'D=M-1',    # D=M[4] - 1
       '@THIS',    # A=THIS
       'M=D'       # M[THIS]=D 
     )
 
     # ARG = *(FRAME - 3)
     assembly_builder.push(
-      '@THIS',     # A=THIS,
+      '@THIS',    # A=THIS,
       'D=M-1',    # D=M[THIS] - 1
       '@ARG',     # A=ARG
       'M=D'       # M[ARG]=D 
@@ -422,7 +422,7 @@ module CodeWriter
     assembly_builder.push(
       '@ARG',     # A=ARG,
       'D=M-1',    # D=M[ARG] - 1
-      '@LCL',    # A=LCL
+      '@LCL',     # A=LCL
       'M=D'       # M[LCL]=D 
     )
     

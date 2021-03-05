@@ -320,21 +320,77 @@ module CodeWriter
 
   def writeCall(function_name, num_args)
     assembly_builder = []
+
+    # push return-address
+    assembly_builder.concat writePushPop('C_PUSH','constant', "return-#{function_name}")
+    # push LCL
     assembly_builder.push(
-      
+      '@LCL',
+      'D=M',
+      '@SP',
+      'A=M',
+      'M=D',
+      '@SP',
+      'M=M+1'
+    )
+    # push ARG
+    assembly_builder.push(
+      '@ARG',
+      'D=M',
+      '@SP',
+      'A=M',
+      'M=D',
+      '@SP',
+      'M=M+1'
+    )
+    # push THIS
+    assembly_builder.push(
+      '@THIS',
+      'D=M',
+      '@SP',
+      'A=M',
+      'M=D',
+      '@SP',
+      'M=M+1'
+    )
+    # push THAT
+    assembly_builder.push(
+      '@THAT',
+      'D=M',
+      '@SP',
+      'A=M',
+      'M=D',
+      '@SP',
+      'M=M+1'
+    )
+    # ARG = SP-n-5
+    tmp_num = 5 + num_args.to_i
+    assembly_builder.push(
+      '@SP',
+      'D=M',
+      "@#{tmp_num}",
+      'D=D-A',
+      '@ARG',
+      'M=D'
+    )
+    # LCL = SP
+    assembly_builder.push(
+      '@SP',
+      'D=M',
+      '@LCL',
+      'M=D'
+    )
+    # goto f
+    assembly_builder.push(
+      "@#{function_name}",
+      '0;JMP'
+    )
+    # (return address)
+    assembly_builder.push(
+      "(return-#{function_name})", # Declare a label for the function entry
     )
 
     return assembly_builder
-
-    # push return-address
-    # push LCL
-    # push ARG
-    # push THIS
-    # push THAT
-    # ARG = SP-n-5
-    # LCL = SP
-    # got f
-    # (return address)
   end
 
   def writeFunction(function_name, num_locals)
@@ -345,7 +401,7 @@ module CodeWriter
 
     num_locals.to_i.times do |i|
       puts i
-      assembly_builder.concat writePushPop('C_PUSH', 'argument', i)
+      assembly_builder.concat writePushPop('C_PUSH', 'constant', 0)
     end
 
     # function f k
@@ -364,21 +420,19 @@ module CodeWriter
     # FRAME = LCL
     assembly_builder.push(
       '@LCL',          # A = 1
-      'A=M',           # A = M[1] = 300
-      'D=M',           # D = M[300]
-      '@6',            # A = 6
-      'M=D'            # M[6] = 258
+      'D=M',           # D = M[1]
+      '@13',           # A = 13
+      'M=D'            # M[13] = 258
     )
 
     # RET = *(FRAME - 5)
     assembly_builder.push(
-      '@6',            # A = 6
-      'D=M-1',         # D = M[6] - 5 = 0 - 5
-      'D=D-1',         # D = M[300] - 5
-      'D=D-1',         # D = M[300] - 5
-      'D=D-1',         # D = M[300] - 5
-      'D=D-1',         # D = M[300] - 5
-      '@7',             # A = 7
+      '@13',            # A = 6
+      'D=M',
+      '@5',
+      'A=D-A',
+      'D=M',
+      '@14',           # A =14
       'M=D'            # M[7] = 253
     )
 
@@ -397,40 +451,49 @@ module CodeWriter
 
     # THAT = *(FRAME-1)
     assembly_builder.push(
-      '@6',     # A=6,
-      'D=M-1',  # D=M[6] - 1 = 1234 - 1
+      '@13',     # A=6,
+      'A=M-1',
+      'D=M',
       '@THAT',  # A=0
       'M=D'     # M[0]=D 
     )
     # THIS = *(FRAME - 2)
     assembly_builder.push(
-      '@THAT',    # A=4,
-      'D=M-1',    # D=M[4] - 1
+      '@13',    # A=4,
+      'D=M',
+      '@2',
+      'A=D-A',
+      'D=M',
       '@THIS',    # A=THIS
       'M=D'       # M[THIS]=D 
     )
 
     # ARG = *(FRAME - 3)
     assembly_builder.push(
-      '@THIS',    # A=THIS,
-      'D=M-1',    # D=M[THIS] - 1
-      '@ARG',     # A=ARG
-      'M=D'       # M[ARG]=D 
+      '@13',
+      'D=M',
+      '@3',
+      'A=D-A',
+      'D=M',
+      '@ARG',
+      'M=D'
     )
 
     # LCL = *(FRAME - 4)
     assembly_builder.push(
-      '@ARG',     # A=ARG,
-      'D=M-1',    # D=M[ARG] - 1
-      '@LCL',     # A=LCL
-      'M=D'       # M[LCL]=D 
+      '@13',
+      'D=M',
+      '@4',
+      'A=D-A',
+      'D=M',
+      '@LCL',
+      'M=D'
     )
     
     # goto RET
     assembly_builder.push(
-      '@LCL',
-      'D=M-1',
-      'A=D',
+      '@14',
+      'A=M',
       '0;JMP'
     )
 

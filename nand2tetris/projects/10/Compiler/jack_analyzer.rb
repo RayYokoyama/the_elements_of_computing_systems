@@ -16,9 +16,10 @@ class JackAnalyzer
         # 
         jt = JackTokenizer.new(file.read)
         tokens = jt.exec
+        p tokens
 
         jp = JackParser.new(tokens)
-        xml = jp.execT
+        xml = jp.exec
         
         w.write(xml)
       end

@@ -47,6 +47,8 @@ class JackTokenizer
     is_building_string = false
     str.split('').each do |char|
       if (SYMBOL.include?(char))
+        tokens.push(char_building) if char_building != ''
+        char_building = ''
         tokens.push(char)
 
       elsif (char == '"' && !is_building_string)

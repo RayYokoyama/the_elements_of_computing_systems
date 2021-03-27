@@ -14,7 +14,6 @@ class JackTokenizer
       line = line.gsub(/\/\*\*.*\*\//, '')
       line = line.strip()
 
-
       # Multi Comment Strip
       if line.include?('/**')
         is_multi_commenting = true

@@ -100,9 +100,6 @@ class JackParser
   
       # subroutineDec
       add_block('subroutineDec') if (current_block == 'class' && SUBROUTINE_DEC_KEYWORDS.include?(token))
-  
-      # parameterList
-      add_block('parameterList') if (current_block == 'subroutineDec' && token == '(')
     
       # subroutineBody
       add_block('subroutineBody') if (current_block == 'subroutineDec' && token == '{')
@@ -114,7 +111,7 @@ class JackParser
       add_block('statements') if (current_block != 'statements' && STATEMENTS.include?(token))
   
       # letStatement
-      add_block('letStatement') if (current_block != 'statements' && token == 'let')
+      add_block('letStatement') if (current_block == 'statements' && token == 'let')
   
       # ifStatement
       add_block('ifStatement') if (current_block == 'statements' && token == 'if')
@@ -128,21 +125,25 @@ class JackParser
 
       # ReturnStatement
       add_block('returnStatement') if (current_block == 'statements' && token == 'return')
-
-      # expression
-      add_block('expression') if (STATEMENT_BLOCK.include?(current_block) && token =='(')
-      add_block('expression') if (current_block == 'letStatement' && token == '[')
   
       # term
       add_block('term') if (current_block == 'expression' && !OP.include?(token))
 
+      # parameterList
+      pop_block('parameterList') if (current_block == 'parameterList' && token == ')')
+
       @arr.push execT(token)
+
+      # expression
+      add_block('expression') if (STATEMENT_BLOCK.include?(current_block) && token =='(')
+      add_block('expression') if (current_block == 'letStatement' && ['[', '='].include?(token))
+
+      # parameterList
+      add_block('parameterList') if (current_block == 'subroutineDec' && token == '(')
 
       # POP
       # subroutineBody
       pop_block('subroutineBody') if (current_block == 'subroutineBody' && token == '}')
-      # parameterList
-      pop_block('parameterList') if (current_block == 'parameterList' && token == ')')
 
       # subroutineDec
       pop_block('subroutineDec') if (current_block == 'subroutineDec' && token == '}')

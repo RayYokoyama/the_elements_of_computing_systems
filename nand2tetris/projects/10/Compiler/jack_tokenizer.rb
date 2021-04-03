@@ -65,6 +65,9 @@ class JackTokenizer
         tokens.push(char_building)
         char_building = ''
 
+      elsif (char == ' ' && is_building_string)
+        char_building = char_building + char
+
       elsif (char != ' ')
         char_building = char_building + char
 
